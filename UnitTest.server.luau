@@ -1,6 +1,6 @@
 --!strict
 
---- ### QuestTest.server.luau
+--- ### UnitTest.server.luau
 ---
 --- QuestModule.luau test script
 
