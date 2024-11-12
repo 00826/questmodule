@@ -1,0 +1,19 @@
+{
+	"name": "questmodule",
+	"tree": {
+		"$className": "DataModel",
+
+		"HttpService": {
+			"$className": "HttpService",
+			"$properties": { "HttpEnabled": true }
+		},
+		"ReplicatedStorage": {
+			"$className": "ReplicatedStorage",
+			"QuestModule": { "$path": "QuestModule" }
+		},
+		"ServerScriptService": {
+			"$className": "ServerScriptService",
+			"UnitTest": { "$path": "UnitTest.server.luau" }
+		}
+	}
+}
