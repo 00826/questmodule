@@ -1,5 +1,21 @@
 --!strict
 
+--[[
+_template = {
+	Name = ""; Desc = "";
+	Priority = 0; Repeatable = false;
+
+	Steps = {
+		{
+			Desc = "";
+			Goal = 1; Signals = {  }; Rewards = {  };
+		};
+	};
+};]]
+
+--- catch luaulsp annotation
+local _
+
 --- type describing a questprofile, ideally saved to player save data
 export type QuestProfile = {
 	--- array of already-completed quests, in cases
@@ -23,8 +39,8 @@ export type Step = {
 	Rewards: {  }?;
 
 	-- optional fields for quest interfaces etc:
-	--- step objective
-	Objective: string?;
+	--- step description
+	Desc: string?;
 }
 
 --- type describing a quest, where each element of `Quest.Steps` is interpreted as a step
@@ -40,6 +56,8 @@ export type Quest = {
 	Priority: number?;
 	--- is this quest repeatable? (with respect to `QuestProfile.Completed`)
 	Repeatable: boolean?;
+	--- rbxasset:// associated with this quest
+	Sprite: string?;
 }
 
 --- type describing the return value of `QuestModule.addprogress()`
@@ -49,7 +67,7 @@ export type Manifest = {
 	--- array of quests where a step was advanced (`SavedQuest[1] += 1`)
 	Advancements: { string };
 	--- array of quests where a step had progress added (`SavedQuest[2] += n`)
-	Progress: {  };
+	Progress: { string };
 	--- array of reward tables from completed steps
 	Rewards: {  };
 	--- array of non-existent, erroneous quests (lacking quest info) \
@@ -60,11 +78,7 @@ export type Manifest = {
 --- ### QuestModule.luau
 ---
 --- cleanly handles linear, multi-step-style quests
-local QuestModule = {
-	--- if using external quest table, can easily change the path \
-	--- all quest tables should follow type structure `{ [string]: Quest }`
-	Quests = require(script._examplecontainer) :: { [string]: Quest }
-}
+local QuestModule = { Quests = { } :: { [string]: Quest } }
 
 --- returns an empty QuestProfile
 function QuestModule.createprofile(): QuestProfile
@@ -98,7 +112,7 @@ end
 --- recommended to verify with QuestModule.canadd(id, qp) as this can overwrite pre-existing progress \
 --- returns `QuestProfile.Current[id]` for convenience
 function QuestModule.add(id: string, qp: QuestProfile)
-	qp.Current[id] = table.create(2, 0) --- faster way of doing {0, 0}
+	qp.Current[id] = {1, 0} --- step 1, progress 0
 
 	return qp.Current[id]
 end
@@ -120,6 +134,11 @@ function QuestModule.progress(qp: QuestProfile, progress: { [string]: number }):
 		local info = QuestModule.Quests[id]
 		if info then
 			local questlength = #info.Steps
+
+			if questlength < 1 then
+				warn(`quest "{id}" has no steps (unable to progress)`)
+				continue
+			end
 
 			--- avoid quest softlock
 			do
@@ -190,6 +209,17 @@ function QuestModule.wipe(id: string, qp: QuestProfile, removefromcompleted: boo
 
 	if removefromcompleted then
 		table.remove(qp.Completed, table.find(qp.Completed, id) or 0)
+	end
+end
+
+--- returns quest+step as a unique string \
+--- for use-cases where the context of quest progression matters (such as dialogs)
+function QuestModule.tostring(qp: QuestProfile, id: string): string?
+	local quest = qp.Current[id]
+	if quest then
+		return string.format("%s_%d", id, quest[1] or 1)
+	else
+		return nil
 	end
 end
 

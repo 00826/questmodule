@@ -9,7 +9,7 @@
 		},
 		"ReplicatedStorage": {
 			"$className": "ReplicatedStorage",
-			"QuestModule": { "$path": "QuestModule" }
+			"QuestModule": { "$path": "QuestModule.luau" }
 		},
 		"ServerScriptService": {
 			"$className": "ServerScriptService",

@@ -9,6 +9,29 @@ local QuestModule = require(ReplicatedStorage:WaitForChild("QuestModule"))
 
 local qp = QuestModule.createprofile()
 
+--- add example quest to questmodule \
+--- ideally `QuestModule.Quests` would point to an external module \
+--- but this just exists for the sake of the unit test
+QuestModule.Quests["examplequest"] = {
+	Name = "example quest"; Desc = "pass the unit test";
+	Priority = 0; Repeatable = false;
+
+	Steps = {
+		[1] = {
+			Desc = "respond to step signals A or B.";
+			Goal = 1; Signals = { "A", "B" }; Rewards = { XP = 50 };
+		};
+		[2] = {
+			Desc = "respond to step signal C.";
+			Goal = 100; Signals = { "C" }; Rewards = { Mango = 1 };
+		};
+		[3] = {
+			Desc = "respond to step signal A";
+			Goal = 1; Signals = { "A" }; Rewards = { XP = 1000; Mango = 100; };
+		};
+	};
+}
+
 local questid_that_errors = "quest_that_does_not_exist"
 local questid = "examplequest"
 
